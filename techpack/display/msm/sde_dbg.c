@@ -3155,12 +3155,15 @@ static void _sde_dump_reg_by_ranges(struct sde_dbg_reg_base *dbg,
 				addr, range_node->offset.start,
 				range_node->offset.end);
 
-			scnprintf(dbg_base->reg_dump_addr, REG_BASE_NAME_LEN,
-					dbg->name);
-			dbg_base->reg_dump_addr += REG_BASE_NAME_LEN;
-			scnprintf(dbg_base->reg_dump_addr, REG_BASE_NAME_LEN,
-					range_node->range_name);
-			dbg_base->reg_dump_addr += RANGE_NAME_LEN;
+			if (dbg_base->reg_dump_addr) {
+				scnprintf(dbg_base->reg_dump_addr, REG_BASE_NAME_LEN,
+						dbg->name);
+				dbg_base->reg_dump_addr += REG_BASE_NAME_LEN;
+				scnprintf(dbg_base->reg_dump_addr, REG_BASE_NAME_LEN,
+						range_node->range_name);
+				dbg_base->reg_dump_addr += RANGE_NAME_LEN;
+			}
+
 			_sde_dump_reg(range_node->range_name, reg_dump_flag,
 					dbg->base, addr, len,
 					&range_node->reg_dump);
@@ -3173,10 +3176,12 @@ static void _sde_dump_reg_by_ranges(struct sde_dbg_reg_base *dbg,
 				dbg->max_offset);
 		addr = dbg->base;
 		len = dbg->max_offset;
-		scnprintf(dbg_base->reg_dump_addr, REG_BASE_NAME_LEN,
-				dbg->name);
-		dbg_base->reg_dump_addr += REG_BASE_NAME_LEN;
-		dbg_base->reg_dump_addr += RANGE_NAME_LEN;
+		if (dbg_base->reg_dump_addr) {
+			scnprintf(dbg_base->reg_dump_addr, REG_BASE_NAME_LEN,
+					dbg->name);
+			dbg_base->reg_dump_addr += REG_BASE_NAME_LEN;
+			dbg_base->reg_dump_addr += RANGE_NAME_LEN;
+		}
 		_sde_dump_reg(dbg->name, reg_dump_flag, dbg->base, addr, len,
 				&dbg->reg_dump);
 	}
