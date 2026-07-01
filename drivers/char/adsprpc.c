@@ -495,6 +495,7 @@ struct fastrpc_file {
 	/* Flag to indicate dynamic process creation status*/
 	enum fastrpc_process_create_state dsp_process_state;
 	struct completion shutdown;
+	bool in_process_create;
 };
 
 static struct fastrpc_apps gfa;
@@ -2695,6 +2696,9 @@ static int fastrpc_init_process(struct fastrpc_file *fl,
 			if (file)
 				file->is_filemap = true;
 			mutex_unlock(&fl->map_mutex);
+			if (file) {
+				file->is_filemap = true;
+			}
 			if (err)
 				goto bail;
 		}
@@ -2703,7 +2707,7 @@ static int fastrpc_init_process(struct fastrpc_file *fl,
 		VERIFY(err, !init->mem);
 		if (err) {
 			err = -EINVAL;
-			pr_err("adsprpc: %s: %s: ERROR: donated memory allocated in userspace\n",
+			pr_err("adsprpc: %s: %s: ERROR: donated memory allocated in userspace \n",
 				current->comm, __func__);
 			goto bail;
 		}
@@ -2908,6 +2912,11 @@ bail:
 	}
 	if (locked) {
 		locked = 0;
+		spin_unlock(&fl->hlock);
+	}
+	if (init->flags == FASTRPC_INIT_CREATE) {
+		spin_lock(&fl->hlock);
+		fl->in_process_create = false;
 		spin_unlock(&fl->hlock);
 	}
 	return err;
@@ -3881,6 +3890,7 @@ static int fastrpc_file_free(struct fastrpc_file *fl)
 	}
 	spin_lock(&fl->hlock);
 	fl->file_close = 1;
+	fl->in_process_create = false;
 	fl->dsp_process_state = PROCESS_CREATE_DEFAULT;
 	spin_unlock(&fl->hlock);
 	if (!IS_ERR_OR_NULL(fl->init_mem))
@@ -4284,6 +4294,7 @@ static int fastrpc_device_open(struct inode *inode, struct file *filp)
 	fl->cid = -1;
 	fl->dev_minor = dev_minor;
 	fl->init_mem = NULL;
+	fl->in_process_create = false;
 	fl->dsp_process_state = PROCESS_CREATE_DEFAULT;
 	memset(&fl->perf, 0, sizeof(fl->perf));
 	fl->qos_request = 0;
@@ -4305,6 +4316,7 @@ static int fastrpc_set_process_info(struct fastrpc_file *fl)
 	int err = 0, buf_size = 0;
 	char strpid[PID_SIZE];
 	char cur_comm[TASK_COMM_LEN];
+
 
 	memcpy(cur_comm, current->comm, TASK_COMM_LEN);
 	cur_comm[TASK_COMM_LEN-1] = '\0';
