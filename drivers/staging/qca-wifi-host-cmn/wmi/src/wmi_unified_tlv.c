@@ -65,6 +65,12 @@
 #include <wmi_unified_vdev_api.h>
 #include <wmi_unified_vdev_tlv.h>
 
+#ifdef OPLUS_FEATURE_WIFI_OPLUSWFD
+//OPLUS_FEATURE_WIFI_OPLUSWFD
+//pc p2p device don't recognize he, and don't reply it with probe response
+extern int oplus_wfd_get_remove_He_ie_flag(void);
+#endif
+
 /* HTC service ids for WMI for multi-radio */
 static const uint32_t multi_svc_ids[] = {WMI_CONTROL_SVC,
 				WMI_CONTROL_SVC_WMAC1,
