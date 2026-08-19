@@ -24571,6 +24571,7 @@ static const struct snd_soc_dapm_widget msm_qdsp6_widgets[] = {
 		0, 0, 0, 0),
 	SND_SOC_DAPM_AIF_OUT("CDC_DMA_UL_HL", "CDC_DMA_HOSTLESS Capture",
 		0, 0, 0, 0),
+#endif
 #ifdef OPLUS_FEATURE_AUDIO_FTM
 	SND_SOC_DAPM_AIF_IN("TX3_CDC_DMA_DL_HL",
 		"TX3_CDC_DMA_HOSTLESS Playback", 0, 0, 0, 0),
@@ -27459,6 +27460,7 @@ static const struct snd_soc_dapm_route intercon[] = {
 	{"RX_CDC_DMA_RX_1_DL_HL", "Switch", "CDC_DMA_DL_HL"},
 	{"RX_CDC_DMA_RX_1", NULL, "RX_CDC_DMA_RX_1_DL_HL"},
 	{"TX3_CDC_DMA_UL_HL", NULL, "TX_CDC_DMA_TX_3"},
+#endif
 #ifdef OPLUS_FEATURE_AUDIO_FTM
 	{"TX4_CDC_DMA_UL_HL", NULL, "TX_CDC_DMA_TX_4"},
 #endif /* OPLUS_FEATURE_AUDIO_FTM */
